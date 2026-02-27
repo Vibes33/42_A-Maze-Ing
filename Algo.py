@@ -149,16 +149,16 @@ class MazeSolver:
             if self.end in self.pattern_cells:
                 return False
 
-        # 1. Au moins un chemin
+        # Au moins un chemin
         shortest_path = self.solve(silent=True)
         if not shortest_path:
             return False
 
-        # 2. PERFECT=False
+        # PERFECT=False
         if not self.is_perfect:
             return True
 
-        # 3. PERFECT=True
+        # PERFECT=True
         if self._has_loops():
             return False
         

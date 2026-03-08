@@ -2,6 +2,22 @@ import random
 from typing import List, Tuple, Set
 
 class MazeGenerator:
+    """Standalone maze generator using Recursive Backtracker (DFS).
+
+    Generates a 2D grid where each cell is a bitmask representing walls:
+        NORTH=1, EAST=2, SOUTH=4, WEST=8 (15 = all walls closed).
+
+    Usage:
+        gen = MazeGenerator(width=20, height=15)
+        grid = gen.generate(perfect=True, pattern_42=True)
+        # grid[y][x] -> int bitmask of cell walls
+        # gen.pattern_cells -> set of (x,y) tuples for the '42' pattern
+
+    Parameters:
+        width (int): Number of columns.
+        height (int): Number of rows.
+    """
+
     # Constantes Bitmask
     NORTH = 1
     EAST  = 2
@@ -17,6 +33,12 @@ class MazeGenerator:
     }
 
     def __init__(self, width: int, height: int):
+        """Initialize the generator with given dimensions.
+
+        Args:
+            width: Maze width in cells (min 10 for pattern_42).
+            height: Maze height in cells (min 10 for pattern_42).
+        """
         self.width = width
         self.height = height
         # On initialise tout à 15
@@ -24,6 +46,16 @@ class MazeGenerator:
         self.pattern_cells: Set[Tuple[int, int]] = set()
 
     def generate(self, perfect: bool = True, pattern_42: bool = False) -> List[List[int]]:
+        """Generate a maze and return the 2D grid.
+
+        Args:
+            perfect: If True, generates a perfect maze (unique path,
+                     no loops). If False, ~5%% of extra walls are removed.
+            pattern_42: If True, carves a '42' pattern at the center.
+
+        Returns:
+            A 2D list of ints (grid[y][x]) where each int is a wall bitmask.
+        """
         # 1. Réinitialisation
         self.grid = [[15 for _ in range(self.width)] for _ in range(self.height)]
 

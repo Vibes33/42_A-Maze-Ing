@@ -3,9 +3,9 @@ from affichage import print_maze, entry_exit_to_coords, print_maze_path
 import sys
 
 
-def main():
+def main(config_file: str) -> None:
     try:
-        solver = MazeSolver()
+        solver = MazeSolver(config_file)
         print("Labyrinthe généré et chargé avec succès.")
         print(f"-> Dimensions : {solver.width} x {solver.height}")
         print(f"-> Mode Perfect : {solver.is_perfect}")
@@ -28,10 +28,10 @@ def main():
 
     # Affichage terminal du labyrinthe
     print("\nAffichage terminal du labyrinthe :\n")
-    entry, exit = entry_exit_to_coords("config.txt")
+    entry, exit_pos = entry_exit_to_coords(config_file)
     entry = tuple(map(int, entry.split(",")))
-    exit = tuple(map(int, exit.split(",")))
-    print_maze(solver.grid, shuffle_colors=False, entry=entry, exit=exit)
+    exit_pos = tuple(map(int, exit_pos.split(",")))
+    print_maze(solver.grid, shuffle_colors=False, entry=entry, exit=exit_pos)
     choice = 0
     show = True
     path = solver.solve(show)
@@ -45,35 +45,35 @@ def main():
         choice = input("\nChoice (1-4): ")
         if choice == '1':
             print("\nRe-generate a new maze")
-            main()
+            main(config_file)
         elif choice == '2':
             print("\nShow/Hide path from entry to exit")
-            print(show)
             if show:
                 show = False
                 path = solver.solve(show)
-                print_maze_path(solver.grid, path=path, entry=entry, exit=exit)
-            elif not show:
+                print_maze_path(solver.grid, path=path,
+                                entry=entry, exit=exit_pos)
+            else:
                 show = True
                 path = solver.solve(show)
                 print_maze(solver.grid,
-                           shuffle_colors=False, entry=entry, exit=exit)
+                           shuffle_colors=False, entry=entry, exit=exit_pos)
         elif choice == '3':
             print("\nRotate maze colors")
             print_maze(solver.grid, shuffle_colors=True,
-                       entry=entry, exit=exit)
-            if not show:
-                show = True
-            elif show:
-                show = True
+                       entry=entry, exit=exit_pos)
         elif choice == '4':
             print("\nExit")
             sys.exit(0)
 
 
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python3 a_maze_ing.py <config_file>")
+        print("Example: python3 a_maze_ing.py config.txt")
+        sys.exit(1)
     try:
-        main()
+        main(sys.argv[1])
     except (KeyboardInterrupt, EOFError):
         print("\n\nExiting A-Maze-ing. Goodbye!")
         sys.exit(0)

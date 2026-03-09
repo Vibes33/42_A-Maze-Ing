@@ -22,6 +22,7 @@ class MazeGenerator:
     EAST = 2
     SOUTH = 4
     WEST = 8
+
     OPPOSITE = {
         NORTH: SOUTH,
         SOUTH: NORTH,
@@ -42,7 +43,8 @@ class MazeGenerator:
         self.pattern_cells: Set[Tuple[int, int]] = set()
 
     def generate(self, perfect: bool = True,
-                 pattern_42: bool = False) -> List[List[int]]:
+                 pattern_42: bool = False,
+                 seed: int = None) -> List[List[int]]:
         """Generate a maze and return the 2D grid.
 
         Args:
@@ -53,17 +55,27 @@ class MazeGenerator:
         Returns:
             A 2D list of ints (grid[y][x]) where each int is a wall bitmask.
         """
+        if seed is not None:
+            random.seed(seed)
+        else:
+            random.seed()
+
         self.grid = [[15 for _ in range(self.width)]
                      for _ in range(self.height)]
         self.pattern_cells = set()
         if pattern_42:
             self._apply_pattern_42()
+
         start_x, start_y = 0, 0
         while (start_x, start_y) in self.pattern_cells:
-            stack = [(start_x, start_y)]
-            visited = set()
-            visited.add((start_x, start_y))
-            visited.update(self.pattern_cells)
+            start_x = random.randint(0, self.width - 1)
+            start_y = random.randint(0, self.height - 1)
+
+        stack = [(start_x, start_y)]
+        visited = set()
+        visited.add((start_x, start_y))
+        visited.update(self.pattern_cells)
+
         while stack:
             cx, cy = stack[-1]
             neighbors = []
@@ -99,8 +111,8 @@ class MazeGenerator:
 
     def _apply_pattern_42(self):
         if self.width < 10 or self.height < 10:
-            print("[Grille trop petite pour le pattern 42 "
-                  "(min 10x10). Ignoré.")
+            print("[Grid too slow fr pattern "
+                  "(min 10x10). Ignored.")
             return
 
         pattern = [

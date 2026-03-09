@@ -26,8 +26,21 @@ class MazeSolver:
             print(f"Value error({e})")
             sys.exit(1)
 
+        self.seed = None
+        if "SEED" in self.config:
+            try:
+                self.seed = int(self.config["SEED"])
+                print(f"-> Seed : {self.seed}")
+            except ValueError:
+                print(f"[Config] Warning: invalid SEED "
+                      f"'{self.config['SEED']}', ignored.")
+                self.seed = None
+        else:
+            print("-> Seed : NONE (Random Maze)")
+
         gen = MazeGenerator(self.width, self.height)
-        self.grid = gen.generate(perfect=self.is_perfect, pattern_42=True)
+        self.grid = gen.generate(perfect=self.is_perfect,
+                                 pattern_42=True, seed=self.seed)
         self.pattern_cells = gen.pattern_cells
 
     def _load_config(self, filepath: str) -> dict[str, str]:

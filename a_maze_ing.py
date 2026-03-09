@@ -6,29 +6,28 @@ import sys
 def main(config_file: str) -> None:
     try:
         solver = MazeSolver(config_file)
-        print("Labyrinthe généré et chargé avec succès.")
+        print("Maze generate successfully generated")
         print(f"-> Dimensions : {solver.width} x {solver.height}")
-        print(f"-> Mode Perfect : {solver.is_perfect}")
-        print(f"-> Départ : {solver.start}")
-        print(f"-> Arrivée : {solver.end}")
+        print(f"-> Perfect Mode: {solver.is_perfect}")
+        print(f"-> Start : {solver.start}")
+        print(f"-> End : {solver.end}")
 
     except Exception as e:
-        print(f"Erreur critique lors de l'init : {e}")
+        print(f"critical error during INIT: {e}")
         return
 
     # validity check
-    print("\nVérification de la validité (Check Validity)...")
+    print("\n(Check Validity)...")
     is_valid = solver.validity_checker()
 
     print(f"    -> Valide : {is_valid}")
     if is_valid:
-        print("    -> Status : Chemin trouvé "
-              "(+ Unicité respectée si demandé).")
+        print("    -> Status : Path find ")
     else:
-        print("    -> Status : Labyrinthe invalide.")
+        print("    -> Status : Invalid Maze")
 
     # Maze
-    print("\nAffichage terminal du labyrinthe :\n")
+    print("\nMaze display:\n")
     entry, exit_pos = entry_exit_to_coords(config_file)
     entry = tuple(map(int, entry.split(",")))
     exit_pos = tuple(map(int, exit_pos.split(",")))

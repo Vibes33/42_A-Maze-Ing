@@ -16,17 +16,18 @@ def main(config_file: str) -> None:
         print(f"Erreur critique lors de l'init : {e}")
         return
 
-    # Vérification de la validité
+    # validity check
     print("\nVérification de la validité (Check Validity)...")
     is_valid = solver.validity_checker()
 
     print(f"    -> Valide : {is_valid}")
     if is_valid:
-        print("    -> Status : Chemin trouvé (+ Unicité respectée si demandé).")
+        print("    -> Status : Chemin trouvé "
+              "(+ Unicité respectée si demandé).")
     else:
         print("    -> Status : Labyrinthe invalide.")
 
-    # Affichage terminal du labyrinthe
+    # Maze
     print("\nAffichage terminal du labyrinthe :\n")
     entry, exit_pos = entry_exit_to_coords(config_file)
     entry = tuple(map(int, entry.split(",")))

@@ -142,14 +142,18 @@ class MazeGenerator:
         """Casse des murs aléatoirement pour créer des boucles"""
         limit = int((self.width * self.height) * 0.05)
         count = 0
+        max_attemps = limit * 20
 
-        while count < limit:
+        while count < limit and max_attemps > 0:
+            max_attemps -= 1
             rx = random.randint(0, self.width - 1)
             ry = random.randint(0, self.height - 1)
 
             direction = random.choice([self.NORTH, self.EAST,
                                        self.SOUTH, self.WEST])
-
+            if (rx, ry) in self.pattern_cells:
+                continue
+				
             dx, dy = 0, 0
             if direction == self.NORTH:
                 dy = -1
@@ -163,6 +167,8 @@ class MazeGenerator:
             nx, ny = rx + dx, ry + dy
 
             if 0 <= nx < self.width and 0 <= ny < self.height:
+                if (nx, ny) in self.pattern_cells:
+                    continue
                 if (self.grid[ry][rx] & direction) != 0:
                     self.grid[ry][rx] &= ~direction
                     self.grid[ny][nx] &= ~self.OPPOSITE[direction]

@@ -1,5 +1,5 @@
-from Algo import MazeSolver
-from affichage import print_maze, entry_exit_to_coords, print_maze_path
+from mazegen.solver import MazeSolver
+from mazegen.affichage import print_maze, entry_exit_to_coords, print_maze_path
 import sys
 
 

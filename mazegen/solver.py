@@ -1,6 +1,6 @@
 import sys
 from collections import deque
-from generator import MazeGenerator
+from .generator import MazeGenerator
 
 
 class MazeSolver:

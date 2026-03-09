@@ -6,15 +6,19 @@ A maze generator and solver written in Python. Generates mazes with a "42" patte
 
 ## 📁 Project Structure
 
-| File | Description |
-|---|---|
-| `a_maze_ing.py` | Main entry point — interactive CLI menu |
-| `generator.py` | `MazeGenerator` class — standalone maze generation module |
-| `Algo.py` | `MazeSolver` class — BFS solver + validity checker |
-| `affichage.py` | Terminal display functions (uses `rich` for colors) |
-| `map2.py` | Output file generator (hex grid + solution) |
-| `config.txt` | Configuration file (dimensions, entry, exit, mode) |
-| `Makefile` | Build automation (install, run, debug, clean, lint) |
+```
+├── mazegen/                  # Reusable pip-installable package
+│   ├── __init__.py           # Package exports
+│   ├── generator.py          # MazeGenerator class (DFS recursive backtracker)
+│   ├── solver.py             # MazeSolver class (BFS solver + validity checker)
+│   ├── affichage.py          # Terminal display functions (rich colors)
+│   └── map2.py               # Output file generator (hex grid + solution)
+├── a_maze_ing.py             # Main entry point — interactive CLI menu
+├── pyproject.toml            # Package build configuration
+├── config.txt                # Maze configuration file
+├── Makefile                  # Build automation
+└── README.md
+```
 
 ---
 
@@ -52,6 +56,31 @@ make lint-strict   # flake8 + mypy --strict
 
 ---
 
+## 📦 Building the `mazegen` package
+
+### Build from source
+```bash
+python3 -m pip install --upgrade build
+python3 -m build
+```
+This generates `dist/mazegen-1.0.0-py3-none-any.whl` and `dist/mazegen-1.0.0.tar.gz`.
+
+Or simply:
+```bash
+make build
+```
+
+### Install the package
+```bash
+pip install dist/mazegen-1.0.0-py3-none-any.whl
+```
+Or:
+```bash
+make install-pkg
+```
+
+---
+
 ## ⚙️ Configuration (`config.txt`)
 
 ```
@@ -72,14 +101,20 @@ PERFECT=True
 
 ---
 
-## 🔧 Using `MazeGenerator` as a standalone module
+## 🔧 Using `mazegen` as a reusable module
 
-`MazeGenerator` is a self-contained class in `generator.py` that can be imported in any project.
+`mazegen` is a pip-installable package that can be imported in any Python project.
 
-### Basic usage
+### Installation
+
+```bash
+pip install mazegen-1.0.0-py3-none-any.whl
+```
+
+### Basic usage — Generate a maze
 
 ```python
-from generator import MazeGenerator
+from mazegen import MazeGenerator
 
 # Instantiate with width and height
 gen = MazeGenerator(width=20, height=15)
@@ -92,16 +127,19 @@ grid = gen.generate(perfect=True, pattern_42=True)
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `width` | `int` | — | Maze width in cells |
-| `height` | `int` | — | Maze height in cells |
+| `width` | `int` | — | Maze width in cells (min 10 for pattern_42) |
+| `height` | `int` | — | Maze height in cells (min 10 for pattern_42) |
 | `perfect` | `bool` | `True` | `True` = unique path (no loops), `False` = multiple paths |
 | `pattern_42` | `bool` | `False` | Carve the "42" pattern at the center of the maze |
+| `seed` | `int` | `None` | Seed for reproducible generation |
 
 ### Accessing the generated structure
 
 ```python
+from mazegen import MazeGenerator
+
 gen = MazeGenerator(20, 15)
-grid = gen.generate(perfect=True, pattern_42=True)
+grid = gen.generate(perfect=True, pattern_42=True, seed=4242)
 
 # grid is a 2D list of ints (bitmask: N=1, E=2, S=4, W=8)
 # 15 = all walls closed, 0 = all walls open
@@ -114,12 +152,31 @@ print(gen.pattern_cells)
 ### Accessing a solution
 
 ```python
-from generator import MazeGenerator
-from Algo import MazeSolver
+from mazegen import MazeSolver
 
 solver = MazeSolver("config.txt")
 path = solver.solve()  # Returns list of directions: ['S', 'E', 'E', 'S', ...]
 print("".join(path))   # e.g. "SEESSWWSSE..."
+```
+
+### Full example
+
+```python
+from mazegen import MazeGenerator, MazeSolver
+
+# 1. Generate
+gen = MazeGenerator(width=20, height=15)
+grid = gen.generate(perfect=False, pattern_42=True, seed=42)
+
+# 2. Solve (via config file)
+solver = MazeSolver("config.txt")
+path = solver.solve(silent=True)
+print(f"Solution: {''.join(path)}")
+print(f"Path length: {len(path)} steps")
+
+# 3. Check validity
+is_valid = solver.validity_checker()
+print(f"Maze valid: {is_valid}")
 ```
 
 ---
